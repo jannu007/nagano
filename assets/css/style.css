@@ -431,7 +431,9 @@ section{ position:relative; padding:10rem 8vw; max-width:1320px; margin:0 auto; 
 .stats{ display:grid; grid-template-columns:repeat(4,1fr); gap:2rem; border-top:1px solid var(--line); padding-top:2.8rem; }
 .stat{ display:flex; flex-direction:column; gap:.5rem; }
 .stat-num{ font-family:var(--serif); font-weight:300; font-size:clamp(1.9rem,3.4vw,2.8rem); color:var(--accent-deep); }
-.stat-num::after{ content:'+'; }
+.stat-num.plus::after{ content:'+'; }
+.stat-num.suffix-pct::after{ content:'%'; }
+.stat-num.prefix-yen::before{ content:'¥'; }
 .stat-label{ font-size:.72rem; color:var(--ink-soft); letter-spacing:.08em; }
 @media (max-width:720px){ .stats{ grid-template-columns:repeat(2,1fr); } }
 

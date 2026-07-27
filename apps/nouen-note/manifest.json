@@ -1,0 +1,15 @@
+{
+  "name": "Nouen Note — 家庭菜園ノート",
+  "short_name": "Nouen Note",
+  "description": "長野の家庭菜園・小さな畑の世話を記録する栽培ノートアプリ",
+  "start_url": "app/",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#eef2e4",
+  "theme_color": "#1f2a17",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}

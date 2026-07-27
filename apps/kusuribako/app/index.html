@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kusuribako — 服薬チェックリスト | YOUKOKU STUDIO</title>
+<meta name="description" content="朝・昼・晩の飲み忘れを防ぐ、シンプルな服薬チェックリストアプリ">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%233f8a75%22>◇</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=Shippori+Mincho:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#eaf2ef; --ink:#16241f; --ink-soft:#72897f; --line:#d3e1db;
+  --accent:#3f8a75; --accent-soft:#dcece5; --paper:#f4faf7;
+  --serif:'Shippori Mincho', serif;
+  --sans:'Zen Kaku Gothic New','Hiragino Kaku Gothic ProN','Yu Gothic',sans-serif;
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+*,*::before,*::after{ box-sizing:border-box; }
+body{ margin:0; background:var(--bg); color:var(--ink); font-family:var(--sans); line-height:1.8; -webkit-font-smoothing:antialiased; }
+a{ color:inherit; text-decoration:none; }
+button{ font-family:inherit; cursor:pointer; }
+input{ font-family:inherit; }
+
+.topbar{ display:flex; align-items:center; justify-content:space-between; padding:1.6rem 8vw; border-bottom:1px solid var(--line); }
+.back{ font-size:.78rem; color:var(--ink-soft); }
+.back:hover{ color:var(--ink); }
+.applogo{ font-family:var(--serif); font-weight:400; font-size:1.1rem; display:flex; align-items:center; gap:.7rem; letter-spacing:.05em; }
+.hanko{
+  display:inline-flex; align-items:center; justify-content:center; flex-shrink:0;
+  width:1.5rem; height:1.5rem; border-radius:42% 58% 61% 39% / 55% 42% 58% 45%;
+  background:var(--accent); color:var(--paper);
+  font-family:var(--serif); font-weight:500; font-size:.82rem; line-height:1; transform:rotate(-3deg); opacity:.94;
+}
+
+main{ max-width:620px; margin:0 auto; padding:3.4rem 8vw 5rem; }
+
+.hero{ margin-bottom:2rem; }
+.hero h1{ font-family:var(--serif); font-weight:400; font-size:clamp(1.5rem,4.4vw,1.9rem); margin:0 0 .7rem; letter-spacing:.02em; }
+.hero p{ color:var(--ink-soft); margin:0; font-size:.88rem; }
+
+.summary{ display:flex; gap:1px; margin-bottom:2.2rem; background:var(--line); }
+.summary-card{ flex:1; background:var(--paper); padding:1.1rem 1rem; text-align:center; }
+.summary-num{ font-family:var(--serif); font-size:1.6rem; font-weight:400; color:var(--accent); font-variant-numeric:tabular-nums; }
+.summary-label{ font-size:.68rem; color:var(--ink-soft); letter-spacing:.05em; }
+
+.add-form{
+  display:flex; flex-direction:column; gap:.7rem; background:var(--paper); border:1px solid var(--line);
+  padding:1.3rem; margin-bottom:2.2rem;
+}
+.add-form input{
+  border:1px solid var(--line); background:var(--bg); color:var(--ink); padding:.7rem .9rem; font-size:.86rem; outline:none;
+}
+.add-form input:focus{ border-color:var(--accent); }
+.time-picks{ display:flex; gap:.5rem; flex-wrap:wrap; }
+.time-pick{
+  border:1px solid var(--line); background:var(--bg); color:var(--ink-soft); padding:.5rem 1rem; font-size:.8rem;
+}
+.time-pick.on{ background:var(--accent); border-color:var(--accent); color:var(--paper); }
+.add-form button[type="submit"]{
+  border:1px solid var(--accent); background:var(--accent); color:var(--paper); padding:.8rem; font-size:.85rem; letter-spacing:.03em;
+}
+
+.med-list{ display:flex; flex-direction:column; gap:1px; background:var(--line); }
+.med-card{ background:var(--paper); padding:1.1rem 1.2rem; }
+.med-top{ display:flex; align-items:baseline; justify-content:space-between; gap:.8rem; margin-bottom:.6rem; }
+.med-name{ font-family:var(--serif); font-size:1.02rem; }
+.med-del{ border:none; background:none; color:var(--ink-soft); opacity:.4; font-size:.78rem; }
+.med-del:hover{ opacity:1; color:#c96a5a; }
+.slot-row{ display:flex; gap:.5rem; flex-wrap:wrap; }
+.slot-chip{
+  border:1px solid var(--line); background:var(--bg); color:var(--ink-soft); padding:.45rem .9rem; font-size:.78rem;
+  transition:background .2s, color .2s, border-color .2s;
+}
+.slot-chip.taken{ background:var(--accent); border-color:var(--accent); color:var(--paper); }
+
+.empty{ text-align:center; padding:3rem 1rem; color:var(--ink-soft); font-size:.86rem; border:1px solid var(--line); }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a href="../index.html" class="back">← Kusuribako について</a>
+  <div class="applogo"><span class="hanko">薬</span>Kusuribako</div>
+</header>
+
+<main>
+  <div class="hero">
+    <h1>今日の分は、飲みましたか。</h1>
+    <p>登録した薬のタイミングごとに、チェックしていきましょう。</p>
+  </div>
+
+  <div class="summary">
+    <div class="summary-card">
+      <div class="summary-num" id="statDone">0</div>
+      <div class="summary-label">今日チェック済み</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-num" id="statTotal">0</div>
+      <div class="summary-label">今日の予定</div>
+    </div>
+  </div>
+
+  <form class="add-form" id="addForm">
+    <input type="text" id="nameInput" placeholder="薬・サプリの名前(例: 血圧のお薬)" maxlength="30" required>
+    <div class="time-picks" id="timePicks">
+      <button type="button" class="time-pick" data-time="morning">朝</button>
+      <button type="button" class="time-pick" data-time="noon">昼</button>
+      <button type="button" class="time-pick" data-time="evening">晩</button>
+      <button type="button" class="time-pick" data-time="night">就寝前</button>
+    </div>
+    <button type="submit">登録する</button>
+  </form>
+
+  <div class="med-list" id="medList"></div>
+  <div class="empty" id="emptyState" style="display:none;">
+    まだ薬が登録されていません。上のフォームから追加してみましょう。
+  </div>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const MEDS_KEY = 'kusuribako_meds_v1';
+  const LOG_KEY = 'kusuribako_log_v1';
+  const TIME_LABEL = { morning: '朝', noon: '昼', evening: '晩', night: '就寝前' };
+
+  const today = () => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  };
+
+  let meds = JSON.parse(localStorage.getItem(MEDS_KEY) || '[]');
+  let log = JSON.parse(localStorage.getItem(LOG_KEY) || '{}');
+  let selectedTimes = new Set();
+
+  const saveMeds = () => localStorage.setItem(MEDS_KEY, JSON.stringify(meds));
+  const saveLog = () => localStorage.setItem(LOG_KEY, JSON.stringify(log));
+
+  function escapeHtml(s) {
+    return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+
+  function render() {
+    const list = document.getElementById('medList');
+    const empty = document.getElementById('emptyState');
+    empty.style.display = meds.length ? 'none' : 'block';
+    const t = today();
+    const dayLog = log[t] || {};
+
+    let done = 0, total = 0;
+    list.innerHTML = meds.map((med) => {
+      const slots = med.times.map((time) => {
+        const key = `${med.id}_${time}`;
+        const taken = !!dayLog[key];
+        total++;
+        if (taken) done++;
+        return `<button class="slot-chip ${taken ? 'taken' : ''}" data-key="${key}">${TIME_LABEL[time]}${taken ? ' ✓' : ''}</button>`;
+      }).join('');
+      return `
+        <div class="med-card">
+          <div class="med-top">
+            <span class="med-name">${escapeHtml(med.name)}</span>
+            <button class="med-del" data-del="${med.id}">削除</button>
+          </div>
+          <div class="slot-row">${slots}</div>
+        </div>
+      `;
+    }).join('');
+
+    document.getElementById('statDone').textContent = done;
+    document.getElementById('statTotal').textContent = total;
+  }
+
+  document.getElementById('timePicks').addEventListener('click', (e) => {
+    const btn = e.target.closest('.time-pick');
+    if (!btn) return;
+    const time = btn.dataset.time;
+    if (selectedTimes.has(time)) selectedTimes.delete(time); else selectedTimes.add(time);
+    btn.classList.toggle('on');
+  });
+
+  document.getElementById('addForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const name = document.getElementById('nameInput').value.trim();
+    if (!name || !selectedTimes.size) return;
+    meds.push({ id: Date.now().toString(36), name, times: [...selectedTimes] });
+    saveMeds();
+    e.target.reset();
+    selectedTimes.clear();
+    document.querySelectorAll('.time-pick').forEach((b) => b.classList.remove('on'));
+    render();
+  });
+
+  document.getElementById('medList').addEventListener('click', (e) => {
+    const del = e.target.closest('[data-del]');
+    if (del) {
+      meds = meds.filter((m) => m.id !== del.dataset.del);
+      saveMeds();
+      render();
+      return;
+    }
+    const chip = e.target.closest('[data-key]');
+    if (chip) {
+      const t = today();
+      log[t] = log[t] || {};
+      log[t][chip.dataset.key] = !log[t][chip.dataset.key];
+      saveLog();
+      render();
+    }
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
