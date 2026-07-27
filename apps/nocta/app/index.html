@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nocta — 睡眠サウンド | YOUKOKU STUDIO</title>
+<meta name="description" content="上質な眠りへ誘う、ブラウザ生成のアンビエントサウンドプレイヤー">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>☾</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=Shippori+Mincho:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#14100b; --bg-soft:#1f1912; --ink:#e4dccb; --ink-soft:#948a76; --line:#352d20;
+  --accent:#bb5330; --accent-soft:#3a2c1f;
+  --serif:'Shippori Mincho', serif;
+  --sans:'Zen Kaku Gothic New','Hiragino Kaku Gothic ProN','Yu Gothic',sans-serif;
+}
+*,*::before,*::after{ box-sizing:border-box; }
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:var(--sans); line-height:1.8; -webkit-font-smoothing:antialiased; min-height:100vh;
+  position:relative;
+}
+body::before{
+  content:''; position:fixed; inset:0; pointer-events:none; z-index:0; opacity:.25; mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+a{ color:inherit; text-decoration:none; }
+button{ font-family:inherit; cursor:pointer; }
+
+.topbar{ position:relative; z-index:1; display:flex; align-items:center; justify-content:space-between; padding:1.6rem 8vw; border-bottom:1px solid var(--line); }
+.back{ font-size:.78rem; color:var(--ink-soft); }
+.back:hover{ color:var(--ink); }
+.applogo{ font-family:var(--serif); font-weight:400; font-size:1.1rem; display:flex; align-items:center; gap:.7rem; letter-spacing:.05em; }
+.hanko{
+  display:inline-flex; align-items:center; justify-content:center; flex-shrink:0;
+  width:1.5rem; height:1.5rem; border-radius:42% 58% 61% 39% / 55% 42% 58% 45%;
+  background:var(--accent); color:var(--bg);
+  font-family:var(--serif); font-weight:500; font-size:.82rem; line-height:1; transform:rotate(-3deg); opacity:.94;
+}
+
+main{ position:relative; z-index:1; max-width:620px; margin:0 auto; padding:4rem 8vw 5rem; }
+.hero{ margin-bottom:2.8rem; }
+.hero h1{ font-family:var(--serif); font-weight:400; font-size:clamp(1.7rem,5vw,2.2rem); margin:0 0 .8rem; letter-spacing:.02em; }
+.hero p{ color:var(--ink-soft); margin:0; font-size:.88rem; line-height:1.9; }
+
+.sound-grid{ display:grid; grid-template-columns:1fr 1fr; gap:1px; margin-bottom:3rem; background:var(--line); }
+.sound-card{
+  background:var(--bg-soft); padding:1.4rem;
+  display:flex; flex-direction:column; gap:1rem; transition:background .3s;
+}
+.sound-card.active{ background:#332b20; }
+.sound-top{ display:flex; align-items:center; justify-content:space-between; }
+.sound-icon{ font-size:1.2rem; opacity:.85; }
+.sound-name{ font-size:.84rem; font-weight:400; }
+.sound-toggle{
+  width:32px; height:32px; border-radius:50%; border:1px solid var(--line); background:transparent; color:var(--ink-soft);
+  display:flex; align-items:center; justify-content:center; font-size:.8rem; transition:border-color .3s, color .3s;
+}
+.sound-card.active .sound-toggle{ border-color:var(--accent); color:var(--accent); }
+.sound-vol{ width:100%; accent-color:var(--accent); }
+
+.timer-section{ background:var(--bg-soft); border:1px solid var(--line); padding:1.5rem 1.6rem; }
+.timer-title{ font-size:.76rem; letter-spacing:.08em; color:var(--ink-soft); margin:0 0 1.1rem; }
+.timer-options{ display:flex; gap:.5rem; flex-wrap:wrap; margin-bottom:1.1rem; }
+.timer-btn{
+  border:1px solid var(--line); background:transparent; color:var(--ink-soft);
+  padding:.55rem 1.1rem; font-size:.76rem; transition:background .3s, color .3s, border-color .3s;
+}
+.timer-btn.active{ background:var(--accent); color:var(--bg); }
+.timer-status{ font-size:.8rem; color:var(--ink-soft); font-variant-numeric:tabular-nums; }
+.timer-status strong{ color:var(--ink); font-family:var(--serif); font-weight:400; font-size:1.05rem; }
+
+.stop-all{
+  display:block; margin:2.4rem auto 0; border:none; background:none; color:var(--ink-soft); font-size:.76rem;
+  text-decoration:underline; text-underline-offset:.25em;
+}
+.stop-all:hover{ color:var(--accent); }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a href="../index.html" class="back">← Nocta について</a>
+  <div class="applogo"><span class="hanko">眠</span>Nocta</div>
+</header>
+
+<main>
+  <div class="hero">
+    <h1>今夜も、静かに眠る。</h1>
+    <p>好きな音を重ねてミックスできます。すべてブラウザ内でリアルタイム生成しているため、音源ファイルは一切使用していません。</p>
+  </div>
+
+  <div class="sound-grid" id="soundGrid"></div>
+
+  <div class="timer-section">
+    <p class="timer-title">Sleep Timer</p>
+    <div class="timer-options" id="timerOptions">
+      <button class="timer-btn active" data-min="0">オフ</button>
+      <button class="timer-btn" data-min="15">15分</button>
+      <button class="timer-btn" data-min="30">30分</button>
+      <button class="timer-btn" data-min="60">60分</button>
+      <button class="timer-btn" data-min="90">90分</button>
+    </div>
+    <div class="timer-status" id="timerStatus">タイマーは設定されていません</div>
+  </div>
+
+  <button class="stop-all" id="stopAll">すべて停止</button>
+</main>
+
+<script>
+(() => {
+  'use strict';
+
+  let audioCtx = null;
+  const getCtx = () => {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    return audioCtx;
+  };
+
+  function makeNoiseBuffer(kind) {
+    const ctx = getCtx();
+    const len = ctx.sampleRate * 4;
+    const buffer = ctx.createBuffer(1, len, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    let lastOut = 0;
+    for (let i = 0; i < len; i++) {
+      const white = Math.random() * 2 - 1;
+      if (kind === 'brown') {
+        data[i] = (lastOut + 0.02 * white) / 1.02;
+        lastOut = data[i];
+        data[i] *= 3.5;
+      } else {
+        data[i] = white;
+      }
+    }
+    return buffer;
+  }
+
+  const SOUNDS = [
+    { id: 'rain', name: '雨音', icon: '☔', noise: 'white', filter: { type: 'bandpass', freq: 2200, q: 0.5 }, lfo: { freq: 5, depth: 0.12 }, base: 0.5 },
+    { id: 'ocean', name: '波音', icon: '〜', noise: 'brown', filter: { type: 'lowpass', freq: 900, q: 0.7 }, lfo: { freq: 0.12, depth: 0.22 }, base: 0.6 },
+    { id: 'white', name: 'ホワイトノイズ', icon: '✺', noise: 'white', filter: null, lfo: null, base: 0.35 },
+    { id: 'brown', name: 'ブラウンノイズ', icon: '●', noise: 'brown', filter: null, lfo: null, base: 0.5 },
+  ];
+
+  const active = {};
+
+  function startSound(cfg, volume) {
+    const ctx = getCtx();
+    const buffer = makeNoiseBuffer(cfg.noise);
+    const source = ctx.createBufferSource();
+    source.buffer = buffer;
+    source.loop = true;
+
+    const gain = ctx.createGain();
+    const baseVol = (volume / 100) * cfg.base;
+    gain.gain.value = 0;
+
+    let node = source;
+    if (cfg.filter) {
+      const filter = ctx.createBiquadFilter();
+      filter.type = cfg.filter.type;
+      filter.frequency.value = cfg.filter.freq;
+      filter.Q.value = cfg.filter.q;
+      node.connect(filter);
+      node = filter;
+    }
+    node.connect(gain).connect(ctx.destination);
+
+    let lfo = null, lfoGain = null;
+    if (cfg.lfo) {
+      lfo = ctx.createOscillator();
+      lfo.frequency.value = cfg.lfo.freq;
+      lfoGain = ctx.createGain();
+      lfoGain.gain.value = baseVol * cfg.lfo.depth;
+      lfo.connect(lfoGain).connect(gain.gain);
+      lfo.start();
+    }
+
+    source.start();
+    gain.gain.linearRampToValueAtTime(baseVol, ctx.currentTime + 1);
+
+    active[cfg.id] = { source, gain, lfo, baseVol, cfg };
+  }
+
+  function stopSound(id, fade = 0.8) {
+    const s = active[id];
+    if (!s) return;
+    const ctx = getCtx();
+    s.gain.gain.linearRampToValueAtTime(0, ctx.currentTime + fade);
+    setTimeout(() => {
+      try { s.source.stop(); } catch(e){}
+      try { s.lfo && s.lfo.stop(); } catch(e){}
+    }, fade * 1000 + 100);
+    delete active[id];
+  }
+
+  function setVolume(id, volume) {
+    const s = active[id];
+    if (!s) return;
+    const baseVol = (volume / 100) * s.cfg.base;
+    s.baseVol = baseVol;
+    s.gain.gain.linearRampToValueAtTime(baseVol, getCtx().currentTime + 0.15);
+  }
+
+  const grid = document.getElementById('soundGrid');
+  grid.innerHTML = SOUNDS.map(s => `
+    <div class="sound-card" id="card-${s.id}">
+      <div class="sound-top">
+        <span class="sound-icon">${s.icon}</span>
+        <button class="sound-toggle" data-id="${s.id}" aria-label="${s.name}を再生">▶</button>
+      </div>
+      <div class="sound-name">${s.name}</div>
+      <input type="range" class="sound-vol" data-id="${s.id}" min="0" max="100" value="60">
+    </div>
+  `).join('');
+
+  grid.addEventListener('click', (e) => {
+    const btn = e.target.closest('.sound-toggle');
+    if (!btn) return;
+    const id = btn.dataset.id;
+    const cfg = SOUNDS.find(s => s.id === id);
+    const card = document.getElementById('card-' + id);
+    const slider = grid.querySelector(`.sound-vol[data-id="${id}"]`);
+    if (active[id]) {
+      stopSound(id);
+      card.classList.remove('active');
+      btn.textContent = '▶';
+    } else {
+      startSound(cfg, parseInt(slider.value, 10));
+      card.classList.add('active');
+      btn.textContent = '❚❚';
+    }
+  });
+
+  grid.addEventListener('input', (e) => {
+    const slider = e.target.closest('.sound-vol');
+    if (!slider) return;
+    setVolume(slider.dataset.id, parseInt(slider.value, 10));
+  });
+
+  document.getElementById('stopAll').addEventListener('click', () => {
+    Object.keys(active).forEach(id => {
+      stopSound(id);
+      const card = document.getElementById('card-' + id);
+      card.classList.remove('active');
+      card.querySelector('.sound-toggle').textContent = '▶';
+    });
+    resetTimer();
+  });
+
+  /* ---------- sleep timer ---------- */
+  let timerInterval = null;
+  let timerEnd = null;
+  const timerStatus = document.getElementById('timerStatus');
+  const timerOptions = document.getElementById('timerOptions');
+
+  function resetTimer() {
+    clearInterval(timerInterval);
+    timerInterval = null;
+    timerEnd = null;
+    timerStatus.textContent = 'タイマーは設定されていません';
+    [...timerOptions.children].forEach(b => b.classList.toggle('active', b.dataset.min === '0'));
+  }
+
+  function startTimer(minutes) {
+    clearInterval(timerInterval);
+    timerEnd = Date.now() + minutes * 60000;
+    timerInterval = setInterval(updateTimer, 1000);
+    updateTimer();
+  }
+
+  function updateTimer() {
+    const remain = timerEnd - Date.now();
+    if (remain <= 0) {
+      clearInterval(timerInterval);
+      Object.keys(active).forEach(id => {
+        stopSound(id, 4);
+        const card = document.getElementById('card-' + id);
+        card.classList.remove('active');
+        card.querySelector('.sound-toggle').textContent = '▶';
+      });
+      resetTimer();
+      return;
+    }
+    const m = Math.floor(remain / 60000).toString().padStart(2,'0');
+    const s = Math.floor((remain % 60000) / 1000).toString().padStart(2,'0');
+    timerStatus.innerHTML = `消灯まで <strong>${m}:${s}</strong>`;
+  }
+
+  timerOptions.addEventListener('click', (e) => {
+    const btn = e.target.closest('.timer-btn');
+    if (!btn) return;
+    [...timerOptions.children].forEach(b => b.classList.toggle('active', b === btn));
+    const min = parseInt(btn.dataset.min, 10);
+    if (min === 0) {
+      resetTimer();
+    } else {
+      startTimer(min);
+    }
+  });
+})();
+</script>
+</body>
+</html>
