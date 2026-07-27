@@ -13,6 +13,34 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=Shippori+Mincho:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../shared/detail.css?v=6">
+<style>
+.nouen-plot{ flex:1; position:relative; margin-top:.3rem; border-radius:6px; background:var(--bg); overflow:hidden; }
+.nouen-plot::before{
+  content:''; position:absolute; left:0; right:0; bottom:0; height:22%; background:#c9b98a; opacity:.4;
+}
+.nouen-sprout{ position:absolute; left:50%; bottom:22%; transform:translateX(-50%); }
+.nouen-stem{
+  width:3px; height:0; background:#5f8a4a; margin:0 auto; border-radius:2px;
+  animation:nouenGrow 5s ease-in-out infinite;
+}
+.nouen-leaf{
+  position:absolute; bottom:22px; width:16px; height:11px; background:#5f8a4a; opacity:0;
+  animation:nouenLeaf 5s ease-in-out infinite;
+}
+.nouen-leaf.left{ right:50%; border-radius:100% 0% 100% 0%; transform-origin:right center; }
+.nouen-leaf.right{ left:50%; border-radius:0% 100% 0% 100%; transform-origin:left center; }
+@keyframes nouenGrow{
+  0%{ height:0; }
+  35%,100%{ height:34px; }
+}
+@keyframes nouenLeaf{
+  0%,40%{ opacity:0; transform:scale(.3); }
+  60%,100%{ opacity:.9; transform:scale(1); }
+}
+@media (prefers-reduced-motion:reduce){
+  .nouen-stem, .nouen-leaf{ animation:none !important; }
+}
+</style>
 </head>
 <body>
 
@@ -44,8 +72,13 @@
           <div class="mock-icon"><span>▽</span></div>
           <div class="mock-bar"></div>
           <div class="mock-bar short"></div>
-          <div class="mock-card"></div>
-          <div class="mock-card"></div>
+          <div class="nouen-plot">
+            <div class="nouen-sprout">
+              <div class="nouen-leaf left"></div>
+              <div class="nouen-leaf right"></div>
+              <div class="nouen-stem"></div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

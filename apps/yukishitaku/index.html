@@ -13,6 +13,40 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=Shippori+Mincho:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../shared/detail.css?v=6">
+<style>
+.yuki-screen{ position:relative; overflow:hidden; }
+.yuki-checklist{ display:flex; flex-direction:column; gap:.4rem; margin-top:.2rem; }
+.yuki-item{
+  height:15px; border-radius:4px; background:var(--line); position:relative; overflow:hidden;
+}
+.yuki-item::after{
+  content:''; position:absolute; inset:0; background:#5c7a91; transform:scaleX(0); transform-origin:left;
+  animation:yukiCheck 6s ease-in-out infinite;
+}
+.yuki-item:nth-child(1)::after{ animation-delay:0s; }
+.yuki-item:nth-child(2)::after{ animation-delay:1.2s; }
+.yuki-item:nth-child(3)::after{ animation-delay:2.4s; }
+.yuki-snow{ position:absolute; inset:0; pointer-events:none; }
+.yuki-snow span{
+  position:absolute; top:-8%; width:4px; height:4px; border-radius:50%; background:#5c7a91; opacity:0;
+  animation:yukiFall linear infinite;
+}
+.yuki-snow span:nth-child(1){ left:10%; animation-duration:5s; animation-delay:0s; }
+.yuki-snow span:nth-child(2){ left:32%; animation-duration:6.5s; animation-delay:1s; }
+.yuki-snow span:nth-child(3){ left:54%; animation-duration:5.5s; animation-delay:2s; }
+.yuki-snow span:nth-child(4){ left:70%; animation-duration:7s; animation-delay:.5s; }
+.yuki-snow span:nth-child(5){ left:86%; animation-duration:6s; animation-delay:1.8s; }
+@keyframes yukiCheck{ 0%,10%{ transform:scaleX(0); } 25%,100%{ transform:scaleX(1); } }
+@keyframes yukiFall{
+  0%{ transform:translateY(0); opacity:0; }
+  10%{ opacity:.8; }
+  90%{ opacity:.5; }
+  100%{ transform:translateY(180px); opacity:0; }
+}
+@media (prefers-reduced-motion:reduce){
+  .yuki-item::after, .yuki-snow span{ animation:none !important; }
+}
+</style>
 </head>
 <body>
 
@@ -40,12 +74,18 @@
     </div>
     <div class="hero-visual">
       <div class="mock-phone">
-        <div class="mock-screen dark">
+        <div class="mock-screen dark yuki-screen">
           <div class="mock-icon"><span>✓</span></div>
           <div class="mock-bar"></div>
           <div class="mock-bar short"></div>
-          <div class="mock-card"></div>
-          <div class="mock-card"></div>
+          <div class="yuki-checklist">
+            <div class="yuki-item"></div>
+            <div class="yuki-item"></div>
+            <div class="yuki-item"></div>
+          </div>
+          <div class="yuki-snow">
+            <span></span><span></span><span></span><span></span><span></span>
+          </div>
         </div>
       </div>
     </div>

@@ -13,6 +13,35 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=Shippori+Mincho:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../shared/detail.css?v=6">
+<style>
+.kusuri-slots{ display:flex; gap:.5rem; margin-top:.4rem; }
+.kusuri-slot{
+  flex:1; aspect-ratio:1; border-radius:50%; border:1px solid var(--line); position:relative;
+  display:flex; align-items:center; justify-content:center; overflow:visible;
+}
+.kusuri-slot::before{
+  content:''; position:absolute; inset:0; border-radius:50%; background:#3f8a75;
+  transform:scale(0); animation:kusuriFill 6s ease-in-out infinite;
+}
+.kusuri-slot::after{
+  content:''; position:absolute; inset:-4px; border-radius:50%; border:2px solid #3f8a75; opacity:0;
+  animation:kusuriPulse 6s ease-in-out infinite;
+}
+.kusuri-slot span{ position:relative; z-index:1; font-size:.6rem; color:var(--paper); opacity:0; animation:kusuriCheck 6s ease-in-out infinite; }
+.kusuri-slot:nth-child(1)::before, .kusuri-slot:nth-child(1)::after, .kusuri-slot:nth-child(1) span{ animation-delay:0s; }
+.kusuri-slot:nth-child(2)::before, .kusuri-slot:nth-child(2)::after, .kusuri-slot:nth-child(2) span{ animation-delay:1s; }
+.kusuri-slot:nth-child(3)::before, .kusuri-slot:nth-child(3)::after, .kusuri-slot:nth-child(3) span{ animation-delay:2s; }
+@keyframes kusuriFill{ 0%,15%{ transform:scale(0); } 30%,100%{ transform:scale(1); } }
+@keyframes kusuriCheck{ 0%,20%{ opacity:0; } 35%,100%{ opacity:1; } }
+@keyframes kusuriPulse{
+  0%,15%{ opacity:0; transform:scale(1); }
+  25%{ opacity:.6; }
+  45%{ opacity:0; transform:scale(1.35); }
+}
+@media (prefers-reduced-motion:reduce){
+  .kusuri-slot::before, .kusuri-slot::after, .kusuri-slot span{ animation:none !important; }
+}
+</style>
 </head>
 <body>
 
@@ -44,7 +73,11 @@
           <div class="mock-icon"><span>◇</span></div>
           <div class="mock-bar"></div>
           <div class="mock-bar short"></div>
-          <div class="mock-card"></div>
+          <div class="kusuri-slots">
+            <div class="kusuri-slot"><span>✓</span></div>
+            <div class="kusuri-slot"><span>✓</span></div>
+            <div class="kusuri-slot"><span>✓</span></div>
+          </div>
           <div class="mock-card"></div>
         </div>
       </div>
